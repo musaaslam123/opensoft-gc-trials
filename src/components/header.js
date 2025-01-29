@@ -1,5 +1,17 @@
 import React from "react";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+
+// Styled component for the link
+const StyledLink = styled(Link)({
+  color: "white",
+  textDecoration: "none",
+  marginRight: "1rem",
+  "&:hover": {
+    textDecoration: "underline",
+  },
+});
 
 export default function Header() {
   const navigate = useNavigate();
@@ -11,24 +23,31 @@ export default function Header() {
   };
 
   return (
-    <nav className="bg-blue-600 p-4 text-white flex justify-between">
-      <Link to="/" className="font-bold text-xl">
-        MovieDB
-      </Link>
-      <div>
-        {!token ? (
-          <>
-            <Link to="/login" className="mr-4">
-              Login
-            </Link>
-            <Link to="/register">Register</Link>
-          </>
-        ) : (
-          <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded">
-            Logout
-          </button>
-        )}
-      </div>
-    </nav>
+    <AppBar position="static">
+      <Toolbar sx={{ justifyContent: "space-between" }}>
+        <StyledLink to="/">
+          <Typography variant="h6" component="div">
+            MovieDB
+          </Typography>
+        </StyledLink>
+
+        <div>
+          {!token ? (
+            <>
+              <StyledLink to="/login">
+                <Button color="inherit">Login</Button>
+              </StyledLink>
+              <StyledLink to="/register" sx={{ marginRight: 0 }}>
+                <Button color="inherit">Register</Button>
+              </StyledLink>
+            </>
+          ) : (
+            <Button color="error" variant="contained" onClick={handleLogout}>
+              Logout
+            </Button>
+          )}
+        </div>
+      </Toolbar>
+    </AppBar>
   );
 }

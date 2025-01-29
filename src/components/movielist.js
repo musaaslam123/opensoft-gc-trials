@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { API } from "../api";
 import { Link } from "react-router-dom";
+import { 
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Container,
+  Box
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function MovieList() {
   const [movies, setMovies] = useState([]);
@@ -30,37 +41,52 @@ export default function MovieList() {
   }, []);
 
   return (
-    <div>
-      <form onSubmit={handleSearch} className="flex items-center mb-4">
-        <input
-          className="border p-2 flex-grow"
-          type="text"
+    <Container maxWidth="lg">
+      <Box component="form" onSubmit={handleSearch} sx={{ display: 'flex', gap: 2, mb: 4, mt: 4 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
           placeholder="Search movies..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <button
+        <Button
           type="submit"
-          className="bg-green-500 text-white py-2 px-4 ml-2 rounded"
+          variant="contained"
+          color="primary"
+          startIcon={<SearchIcon />}
         >
           Search
-        </button>
-      </form>
+        </Button>
+      </Box>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Grid container spacing={3}>
         {movies.map((movie) => (
-          <div key={movie.id} className="bg-white p-4 rounded shadow">
-            <h2 className="font-bold text-lg mb-2">{movie.title}</h2>
-            <p className="mb-2">Genre: {movie.genre}</p>
-            <Link
-              to={`/movie/${movie.id}`}
-              className="text-blue-500 hover:underline"
-            >
-              View Details
-            </Link>
-          </div>
+          <Grid item xs={12} md={4} key={movie.id}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" component="h2" gutterBottom>
+                  {movie.title}
+                </Typography>
+                <Typography color="textSecondary" gutterBottom>
+                  Genre: {movie.genre}
+                </Typography>
+                <Link 
+                  to={`/movie/${movie.id}`}
+                  style={{ 
+                    textDecoration: 'none', 
+                    color: '#1976d2'
+                  }}
+                >
+                  <Typography sx={{ '&:hover': { textDecoration: 'underline' } }}>
+                    View Details
+                  </Typography>
+                </Link>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
-    </div>
+      </Grid>
+    </Container>
   );
 }
