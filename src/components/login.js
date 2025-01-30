@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API } from "../api";
+import { Box, Container, TextField, Button, Typography, Alert } from "@mui/material";
 
 export default function Login() {
+  const BACKEND_SERVER_URL = "http://localhost:5000"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -12,40 +13,84 @@ export default function Login() {
     e.preventDefault();
     setError(null);
     try {
-      const res = await API.post("/auth/login", { email, password });
-      localStorage.setItem("token", res.data.token);
-      navigate("/");
+      const res = await fetch(`${BACKEND_SERVER_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (res.status !== 200) {
+        throw new Error("Login failed");
+      }
+      const data = await res.json();
+      console.log(data)
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        navigate("/");
+      } else {
+        setError("Login failed");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-4 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      {error && <p className="text-red-600 mb-2">{error}</p>}
-      <form onSubmit={handleLogin} className="flex flex-col">
-        <label className="mb-2 font-semibold">Email</label>
-        <input
-          className="border p-2 mb-4"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <label className="mb-2 font-semibold">Password</label>
-        <input
-          className="border p-2 mb-4"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
+    <Container maxWidth="sm">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: 3,
+          backgroundColor: 'background.paper',
+          borderRadius: 1,
+          boxShadow: 1
+        }}
+      >
+        <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
           Login
-        </button>
-      </form>
-    </div>
+        </Typography>
+
+        {error && <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>}
+
+        <Box component="form" onSubmit={handleLogin} sx={{ width: '100%' }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Sign In
+          </Button>
+        </Box>
+      </Box>
+    </Container>
   );
 }
