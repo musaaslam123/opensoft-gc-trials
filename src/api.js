@@ -7,21 +7,13 @@ export const API = axios.create({
   headers: {
     accept: "application/json",
     Authorization:
-<<<<<<< HEAD
-      "Bearer SECRET_TOKEN", //
-=======
       `Bearer ${AUTH_TOKEN}`, //
->>>>>>> 91edd3eb0555b50fed21feffcc5da7abc51c2c7f
   },
 });
 
 // Use interceptors to attach the token dynamically to each request
 API.interceptors.request.use((config) => {
-<<<<<<< HEAD
-  const token = localStorage.getItem("SECRET_APIKEY"); // This token key must be valid
-=======
   const token = API_KEY // This token key must be valid
->>>>>>> 91edd3eb0555b50fed21feffcc5da7abc51c2c7f
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
