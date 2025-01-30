@@ -1,25 +1,19 @@
 import axios from "axios";
 
+const API_KEY = process.env.REACT_APP_SECRET_APIKEY
+const AUTH_TOKEN = process.env.REACT_APP_SECRET_KEY
 export const API = axios.create({
   baseURL: "https://api.themoviedb.org/3", // Correct base URL for The Movie Database API
   headers: {
     accept: "application/json",
     Authorization:
-<<<<<<< HEAD
-      "Bearer SECRET_KEY",
-=======
-      "Bearer SECRET_TOKEN", //
->>>>>>> 280122b1046e1998d87fddd5b15a9c1dbfa40600
+      `Bearer ${AUTH_TOKEN}`, //
   },
 });
 
 // Use interceptors to attach the token dynamically to each request
 API.interceptors.request.use((config) => {
-<<<<<<< HEAD
-  const token = localStorage.getItem("TOKEN"); // This token key must be valid
-=======
-  const token = localStorage.getItem("SECRET_APIKEY"); // This token key must be valid
->>>>>>> 280122b1046e1998d87fddd5b15a9c1dbfa40600
+  const token = API_KEY // This token key must be valid
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
