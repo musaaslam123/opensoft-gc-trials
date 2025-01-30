@@ -27,7 +27,7 @@ export default function Header() {
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <StyledLink to="/">
           <Typography variant="h6" component="div">
-            MovieDB
+            MMM Flix
           </Typography>
         </StyledLink>
 
