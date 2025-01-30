@@ -5,12 +5,19 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  background: 'linear-gradient(90deg, #8B0000, #FF0000)',
-  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
+  background: 'transparent',
+  boxShadow: 'none',
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  zIndex: 1100,
+  // backdropFilter: 'blur(5px)',
+  // backgroundColor: 'rgba(0, 0, 0, 0.1)',
 }));
 
 const StyledToolbar = styled(Toolbar)({
-  maxHeight: '150px',
+  height: '80px',
   display: 'flex',
   justifyContent: 'space-between',
   padding: '0 24px',
@@ -24,7 +31,7 @@ const StyledLink = styled(Link)({
 });
 
 const LogoImage = styled('img')({
-  height: '300px',
+  height: '80px',
   width: 'auto',
   transition: 'transform 0.3s ease',
   '&:hover': {
@@ -90,65 +97,68 @@ function Header() {
   };
 
   return (
-    <StyledAppBar position="static">
-      <Container maxWidth="xl">
-        <StyledToolbar>
-          <StyledLink to="/">
-            <LogoImage src="/logo.png" alt="MMM Flix" />
-          </StyledLink>
+    <StyledAppBar>
+      <StyledToolbar>
+        <StyledLink to="/">
+          <LogoImage src="/logo_2.png" alt="MMM Flix" />
+        </StyledLink>
 
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
-            <NavItem component={Link} to="/movies">Movies</NavItem>
-            <NavItem component={Link} to="/series">Series</NavItem>
-            <NavItem component={Link} to="/trending">Trending</NavItem>
-           
-            
-            {!token ? (
-              <StyledButton component={Link} to="/login">
-                Login
-              </StyledButton>
-            ) : (
-              <StyledButton onClick={handleLogout}>
-                Logout
-              </StyledButton>
-            )}
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+        <NavItem component={Link} to="/trending">Trending</NavItem>
+          
+          <NavItem component={Link} to="/popular">Popular</NavItem>
+          <NavItem component={Link} to="/upcoming">Upcoming</NavItem>
+          
+          
+          {!token ? (
+            <>
+            <StyledButton component={Link} to="/login">
+              Login
+            </StyledButton>
             <StyledButton component={Link} to="/register" >
-                Register
-              </StyledButton>
-          </Box>
+            Register
+          </StyledButton>
+            </>
+            
+          ) : (
+            <StyledButton onClick={handleLogout}>
+              Logout
+            </StyledButton>
+          )}
+          
+        </Box>
 
-          <IconButton
-            size="large"
-            edge="end"
-            sx={{ display: { xs: 'flex', md: 'none' }, color: 'white' }}
-            onClick={handleMenu}
-          >
-            <MenuIcon />
-          </IconButton>
+        <IconButton
+          size="large"
+          edge="end"
+          sx={{ display: { xs: 'flex', md: 'none' }, color: 'white' }}
+          onClick={handleMenu}
+        >
+          <MenuIcon />
+        </IconButton>
 
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-            sx={{
-              '& .MuiPaper-root': {
-                backgroundColor: 'rgba(33, 150, 243, 0.95)',
-                marginTop: '8px',
-              },
-            }}
-          >
-            <MenuItem component={Link} to="/movies" onClick={handleClose}>Movies</MenuItem>
-            <MenuItem component={Link} to="/series" onClick={handleClose}>Series</MenuItem>
-            <MenuItem component={Link} to="/trending" onClick={handleClose}>Trending</MenuItem>
-            {!token ? (
-              <MenuItem component={Link} to="/login" onClick={handleClose}>Login</MenuItem>
-            ) : (
-              <MenuItem onClick={() => { handleClose(); handleLogout(); }}>Logout</MenuItem>
-            )}
-        
-          </Menu>
-        </StyledToolbar>
-      </Container>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+          sx={{
+            '& .MuiPaper-root': {
+              backgroundColor: 'rgba(33, 150, 243, 0.95)',
+              marginTop: '8px',
+            },
+          }}
+        >
+          <MenuItem component={Link} to="/movies" onClick={handleClose}>Movies</MenuItem>
+          <MenuItem component={Link} to="/series" onClick={handleClose}>Series</MenuItem>
+          <MenuItem component={Link} to="/trending" onClick={handleClose}>Trending</MenuItem>
+          {!token ? (
+            <MenuItem component={Link} to="/login" onClick={handleClose}>Login</MenuItem>
+          ) : (
+            <MenuItem onClick={() => { handleClose(); handleLogout(); }}>Logout</MenuItem>
+          )}
+      
+        </Menu>
+      </StyledToolbar>
     </StyledAppBar>
   );
 }

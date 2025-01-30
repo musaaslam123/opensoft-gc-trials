@@ -6,13 +6,16 @@ import Register from "./components/register";
 import MovieList from "./components/movielist";
 import MovieDetail from "./components/movieDetail";
 import ProtectedRoute from "./components/protectedRoute";
+import TrendingMovies from "./components/TrendingMovies";
+import Popular from "./components/Popular";
+import Upcoming from "./components/Upcoming";
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-100">
+      <div style={{ overflow: 'hidden', margin: 0, padding: 0 }}>
         <Header />
-        <div className="container mx-auto py-4">
+        <div>
           <Routes>
             <Route path="/" element={<MovieList />} />
             <Route path="/movie/:id" element={<MovieDetail />} />
@@ -30,7 +33,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route path="/trending" element={<TrendingMovies />} />
+            <Route path="/popular" element={<Popular />} />
+            <Route path="/upcoming" element={<Upcoming />} />
+
           </Routes>
+
+
         </div>
       </div>
     </BrowserRouter>
