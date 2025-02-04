@@ -1,8 +1,8 @@
 import { AppBar, Toolbar, Button, Typography, Box, Container, IconButton, Menu, MenuItem } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: 'transparent',
@@ -12,8 +12,8 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   left: 0,
   right: 0,
   zIndex: 1100,
-  // backdropFilter: 'blur(5px)',
-  // backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  transition: 'transform 0.3s ease-in-out',
+  backdropFilter: 'blur(10px)',
 }));
 
 const StyledToolbar = styled(Toolbar)({
@@ -30,14 +30,15 @@ const StyledLink = styled(Link)({
   alignItems: 'center',
 });
 
-const LogoImage = styled('img')({
+const LogoImage = styled('img')(({ isscrolled, showglasseffect }) => ({
   height: '80px',
   width: 'auto',
   transition: 'transform 0.3s ease',
   '&:hover': {
     transform: 'scale(1.05)',
   },
-});
+  className: (showglasseffect === 'true' && isscrolled === 'true') ? 'logo-scrolled' : '',
+}));
 
 const StyledButton = styled(Button)(({ theme }) => ({
   margin: theme.spacing(1),
@@ -55,7 +56,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const NavItem = styled(Typography)(({ theme }) => ({
+const NavItem = styled(Typography)(({ theme, isscrolled, showglasseffect }) => ({
   margin: theme.spacing(0, 2),
   cursor: 'pointer',
   position: 'relative',
@@ -76,12 +77,21 @@ const NavItem = styled(Typography)(({ theme }) => ({
     width: '100%',
     left: '0',
   },
+  '&.scrolled': {
+    className: (showglasseffect === 'true' && isscrolled === 'true') ? 'nav-item-scrolled' : '',
+    
+  }
 }));
 
 function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isScrollablePage = ['/trending', '/popular', '/upcoming'].includes(location.pathname);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const token = localStorage.getItem("token");
+  const [prevScrollPos, setPrevScrollPos] = useState(window.pageYOffset);
+  const [visible, setVisible] = useState(true);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -96,18 +106,44 @@ function Header() {
     navigate("/login");
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollPos = window.pageYOffset;
+      const isScrolledDown = prevScrollPos < currentScrollPos;
+      const isMinScroll = currentScrollPos < 10;
+
+      setVisible(!isScrolledDown || isMinScroll);
+      setPrevScrollPos(currentScrollPos);
+      setIsScrolled(currentScrollPos > 50);
+    };
+
+    if (isScrollablePage) {
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    } else {
+      setVisible(true);
+      setIsScrolled(false);
+    }
+  }, [isScrollablePage, prevScrollPos]);
+
   return (
-    <StyledAppBar>
+    <StyledAppBar 
+      isscrolled={isScrolled.toString()} 
+      showglasseffect={isScrollablePage.toString()}
+      sx={{
+        transform: visible ? 'translateY(0)' : 'translateY(-100%)',
+      }}
+    >
       <StyledToolbar>
         <StyledLink to="/">
-          <LogoImage src="/logo_2.png" alt="MMM Flix" />
+          <LogoImage src="/logo_2.png" alt="MMM Flix" isscrolled={isScrolled.toString()} showglasseffect={isScrollablePage.toString()} />
         </StyledLink>
 
         <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
-        <NavItem component={Link} to="/trending">Trending</NavItem>
+        <NavItem component={Link} to="/trending" isscrolled={isScrolled.toString()} showglasseffect={isScrollablePage.toString()}>Trending</NavItem>
           
-          <NavItem component={Link} to="/popular">Popular</NavItem>
-          <NavItem component={Link} to="/upcoming">Upcoming</NavItem>
+          <NavItem component={Link} to="/popular" isscrolled={isScrolled.toString()} showglasseffect={isScrollablePage.toString()}>Popular</NavItem>
+          <NavItem component={Link} to="/upcoming" isscrolled={isScrolled.toString()} showglasseffect={isScrollablePage.toString()}>Upcoming</NavItem>
           
           
           {!token ? (
