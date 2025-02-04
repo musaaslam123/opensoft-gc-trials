@@ -14,7 +14,7 @@ import MovieDetails from './components/movieDetail';  // Create this component i
 function App() {
   return (
     <BrowserRouter>
-      <div style={{ overflow: 'hidden', margin: 0, padding: 0 }}>
+      <div style={{ margin: 0, padding: 0 }}>
         <Header />
         <div>
           <Routes>

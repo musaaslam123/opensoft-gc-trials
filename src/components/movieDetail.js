@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { API } from "../api";
 import {
   Box,
   Container,
-  Typography,
   Grid,
+  Typography,
+  Paper,
   Chip,
   Rating,
   Divider,
-  Paper,
-  CircularProgress
-} from "@mui/material";
+  CircularProgress,
+  Stack,
+  Avatar
+} from '@mui/material';
 import { styled } from "@mui/material/styles";
-import { FaAward, FaStar, FaRegClock, FaGlobe, FaLanguage } from "react-icons/fa";
+import {
+  Movie as MovieIcon,
+  Schedule,
+  Language,
+  Star,
+  People
+} from '@mui/icons-material';
 const BACKEND_SERVER_URL = "http://localhost:5000"
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#1a1a1a',
-  color: '#fff',
-  padding: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  minHeight: '80vh'
-}));
 
 const DetailTypography = styled(Typography)(({ theme }) => ({
   color: '#ccc',
@@ -34,10 +34,18 @@ export default function MovieDetail() {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const StyledPaper = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(3),
+    borderRadius: theme.shape.borderRadius,
+    minHeight: '80vh'
+  }));
+
   const fetchMovie = async () => {
     try {
-      const res = await fetch(`${BACKEND_SERVER_URL}/movies/${id}`);
-      setMovie(res.data);
+      const res = await fetch(`${BACKEND_SERVER_URL}/movies/movie/${id}`);
+      const data = await res.json();
+      setMovie(data);
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -62,86 +70,169 @@ export default function MovieDetail() {
   );
 
   return (
-    <Box sx={{ bgcolor: '#121212', minHeight: '100vh', py: 4 }}>
-      <Container>
-        <StyledPaper elevation={3}>
-          <Grid container spacing={4}>
-            {/* Left side - Poster */}
-            <Grid item xs={12} md={4}>
-              <Box
-                component="img"
-                src={movie.poster}
-                alt={movie.title}
-                sx={{
-                  width: '100%',
-                  borderRadius: 2,
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.5)'
-                }}
-              />
+    <Box sx={{
+      minHeight: '100vh',
+      bgcolor: 'background.default',
+      overflow: 'auto',
+      p: { xs: 0, md: 3 }
+    }}>
+      {/* Hero Section */}
+      <Box sx={{
+        position: 'relative',
+        height: { xs: '40vh', md: '60vh' },
+        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.9)), url(${movie.poster})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
+        <Container maxWidth="lg" sx={{ height: '100%' }}>
+          <Grid container alignItems="center" sx={{ height: '100%' }}>
+            <Grid item xs={12} md={4} sx={{ position: 'relative' }}>
+              <Paper elevation={24} sx={{
+                borderRadius: 2,
+                overflow: 'hidden',
+                position: { xs: 'relative', md: 'absolute' },
+                bottom: { md: theme => theme.spacing(4) },
+                width: { xs: '60%', md: '100%' },
+                mx: 'auto'
+              }}>
+                <img src={movie.poster} alt={movie.title} style={{ width: '100%', height: 'auto' }} />
+              </Paper>
             </Grid>
 
-            {/* Right side - Details */}
             <Grid item xs={12} md={8}>
-              <Typography variant="h4" fontWeight="bold" mb={2}>
-                {movie.title} ({movie.year})
-              </Typography>
+              <Stack spacing={2} sx={{
+                color: 'common.white',
+                textAlign: { xs: 'center', md: 'left' },
+                p: 3
+              }}>
+                <Typography variant="h2" fontWeight={700}>{movie.title}</Typography>
 
-              <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Chip
-                  icon={<FaStar />}
-                  label={`IMDb ${movie.imdb.rating}/10`}
-                  color="primary"
-                />
-                <Chip
-                  icon={<FaRegClock />}
-                  label={`${movie.runtime} mins`}
-                  color="secondary"
-                />
-                <Chip label={movie.rated} variant="outlined" />
-              </Box>
+                <Stack direction="row" spacing={2} justifyContent={{ xs: 'center', md: 'flex-start' }}>
+                  {movie.genres.map(genre => (
+                    <Chip
+                      key={genre}
+                      label={genre}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ borderColor: 'rgba(255, 255, 255, 0.3)' }}
+                    />
+                  ))}
+                </Stack>
 
-              <DetailTypography variant="body1" paragraph>
-                {movie.fullplot || movie.plot}
-              </DetailTypography>
-
-              <Divider sx={{ my: 2, bgcolor: 'rgba(255,255,255,0.1)' }} />
-
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <DetailTypography>
-                    <strong>Director:</strong> {movie.directors.join(', ')}
-                  </DetailTypography>
-                  <DetailTypography>
-                    <strong>Cast:</strong> {movie.cast.join(', ')}
-                  </DetailTypography>
-                  <DetailTypography>
-                    <strong>Genres:</strong> {movie.genres.join(', ')}
-                  </DetailTypography>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <DetailTypography>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <FaGlobe />
-                      <strong>Countries:</strong> {movie.countries.join(', ')}
-                    </Box>
-                  </DetailTypography>
-                  <DetailTypography>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <FaLanguage />
-                      <strong>Languages:</strong> {movie.languages.join(', ')}
-                    </Box>
-                  </DetailTypography>
-                  <DetailTypography>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <FaAward />
-                      <strong>Awards:</strong> {movie.awards.text}
-                    </Box>
-                  </DetailTypography>
-                </Grid>
-              </Grid>
+                <Stack direction="row" spacing={3} justifyContent={{ xs: 'center', md: 'flex-start' }}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <MovieIcon fontSize="small" />
+                    <Typography>{movie.year}</Typography>
+                  </Stack>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Schedule fontSize="small" />
+                    <Typography>{movie.runtime} min</Typography>
+                  </Stack>
+                </Stack>
+              </Stack>
             </Grid>
           </Grid>
-        </StyledPaper>
+        </Container>
+      </Box>
+
+      {/* Content Section */}
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={8}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h5" gutterBottom>Overview</Typography>
+              <Typography paragraph sx={{ color: 'text.secondary' }}>
+                {movie.fullplot || movie.plot}
+              </Typography>
+
+              <Divider sx={{ my: 3 }} />
+
+              <Stack spacing={2}>
+                <Typography variant="h6">Cast</Typography>
+                <Grid container spacing={2}>
+                  {movie.cast.map(actor => (
+                    <Grid item key={actor}>
+                      <Chip
+                        avatar={<Avatar>{actor[0]}</Avatar>}
+                        label={actor}
+                        variant="outlined"
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Stack>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <Stack spacing={3}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>Ratings</Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Stack spacing={1}>
+                      <Typography variant="body2" color="text.secondary">
+                        IMDB Rating
+                      </Typography>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <Star color="warning" />
+                        <Typography>{movie.imdb?.rating}/10</Typography>
+                      </Stack>
+                    </Stack>
+                  </Grid>
+                  {movie.tomatoes && (
+                    <Grid item xs={6}>
+                      <Stack spacing={1}>
+                        <Typography variant="body2" color="text.secondary">
+                          Rotten Tomatoes
+                        </Typography>
+                        <Stack spacing={0.5}>
+                          <Typography variant="body2">
+                            Critic: {movie.tomatoes.critic?.meter}%
+                          </Typography>
+                          <Typography variant="body2">
+                            Audience: {movie.tomatoes.viewer?.meter}%
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                  )}
+                </Grid>
+              </Paper>
+
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>Details</Typography>
+                <Stack spacing={2}>
+                  <Stack spacing={0.5}>
+                    <Typography variant="body2" color="text.secondary">
+                      Directed by
+                    </Typography>
+                    <Typography>{movie.directors?.join(', ')}</Typography>
+                  </Stack>
+
+                  <Stack spacing={0.5}>
+                    <Typography variant="body2" color="text.secondary">
+                      Release Date
+                    </Typography>
+                    <Typography>
+                      {new Date(movie.released).toLocaleDateString()}
+                    </Typography>
+                  </Stack>
+
+                  <Stack spacing={0.5}>
+                    <Typography variant="body2" color="text.secondary">
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <Language fontSize="small" />
+                        <span>Languages</span>
+                      </Stack>
+                    </Typography>
+                    <Typography>{movie.languages?.join(', ')}</Typography>
+                  </Stack>
+                </Stack>
+              </Paper>
+            </Stack>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );

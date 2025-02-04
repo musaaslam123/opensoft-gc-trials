@@ -4,7 +4,7 @@ import { API } from "../api";
 import { Link } from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import debounce from 'lodash/debounce';
-
+import { useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
@@ -20,6 +20,7 @@ import { FaStar } from "react-icons/fa";
 import "../styles/movielist.css";
 
 export default function MovieList() {
+  const navigate = useNavigate();
   const [movies, setMovies] = useState([]);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -87,6 +88,9 @@ export default function MovieList() {
   const handleSuggestionClick = (suggestion) => {
     setQuery(suggestion.title); // Updated to handle the new suggestion structure
     setShowSuggestions(false);
+    console.log('Navigating to:', suggestion);
+
+    navigate("/movie/" + suggestion.id);
   };
 
   useEffect(() => {
