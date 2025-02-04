@@ -14,12 +14,45 @@ import {
 import { styled } from "@mui/material/styles";
 import { FaAward, FaStar, FaRegClock, FaGlobe, FaLanguage } from "react-icons/fa";
 const BACKEND_SERVER_URL = "http://localhost:5000"
-
 const StyledBox = styled(Box)(({ theme }) => ({
-  minHeight: '100vh',
+  height: '100vh',
   backgroundColor: '#0a0a0a',
   color: '#fff',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    width: '8px'
+  },
+  '&::-webkit-scrollbar-track': {
+    background: 'rgba(255, 255, 255, 0.05)'
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: '4px'
+  }
 }));
+
+const HeroSection = styled(Box)(({ theme }) => ({
+  height: '60vh',
+  position: 'relative',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'linear-gradient(to bottom, rgba(10, 10, 10, 0.8), #0a0a0a)'
+  }
+}));
+
+const ContentSection = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  zIndex: 1,
+  padding: theme.spacing(4, 0)
+}));
+
 
 const GlassCard = styled(Paper)(({ theme }) => ({
   backgroundColor: 'rgba(30, 30, 30, 0.7)',
@@ -87,74 +120,76 @@ export default function MovieDetail() {
           backgroundAttachment: 'fixed',
         }}
       >
-        <Container maxWidth="lg">
-          <Grid
-            container
-            spacing={4}
-            sx={{
-              height: '100%',
-              alignItems: 'flex-end',
-              pb: 4
-            }}
-          >
-            <Grid item xs={12} md={3}>
-              <Box
-                component="img"
-                src={movie.poster}
-                alt={movie.title}
-                sx={{
-                  width: '100%',
-                  borderRadius: 2,
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-                  transform: 'translateY(25%)',
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={9}>
-              <Typography
-                variant="h2"
-                fontWeight="800"
-                sx={{
-                  textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                  mb: 2
-                }}
-              >
-                {movie.title}
-              </Typography>
+        <ContentSection>
+          <Container maxWidth="lg">
+            <Grid
+              container
+              spacing={4}
+              sx={{
+                height: '100%',
+                alignItems: 'flex-end',
+                pb: 4
+              }}
+            >
+              <Grid item xs={12} md={3}>
+                <Box
+                  component="img"
+                  src={movie.poster}
+                  alt={movie.title}
+                  sx={{
+                    width: '100%',
+                    borderRadius: 2,
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+                    transform: 'translateY(25%)',
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={9}>
+                <Typography
+                  variant="h2"
+                  fontWeight="800"
+                  sx={{
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                    mb: 2
+                  }}
+                >
+                  {movie.title}
+                </Typography>
 
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 3 }}>
-                {movie.genres.map((genre) => (
-                  <MovieInfoChip
-                    key={genre}
-                    label={genre}
-                    size="small"
-                  />
-                ))}
-              </Box>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 3 }}>
+                  {movie.genres.map((genre) => (
+                    <MovieInfoChip
+                      key={genre}
+                      label={genre}
+                      size="small"
+                    />
+                  ))}
+                </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <FaStar color="#f5c518" />
-                  <Typography variant="h6">
-                    {movie.imdb?.rating}/10
-                  </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FaStar color="#f5c518" />
+                    <Typography variant="h6">
+                      {movie.imdb?.rating}/10
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FaRegClock />
+                    <Typography variant="h6">
+                      {movie.runtime} min
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FaLanguage />
+                    <Typography variant="h6">
+                      {movie.languages?.[0]}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <FaRegClock />
-                  <Typography variant="h6">
-                    {movie.runtime} min
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <FaLanguage />
-                  <Typography variant="h6">
-                    {movie.languages?.[0]}
-                  </Typography>
-                </Box>
-              </Box>
+              </Grid>
             </Grid>
-          </Grid>
-        </Container>
+          </Container>
+        </ContentSection>
       </Box>
 
       {/* Content Section */}
