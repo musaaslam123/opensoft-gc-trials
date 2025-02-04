@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/protectedRoute";
 import TrendingMovies from "./components/TrendingMovies";
 import Popular from "./components/Popular";
 import Upcoming from "./components/Upcoming";
+import MovieDetails from './components/movieDetail';  // Create this component if it doesn't exist
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
         <div>
           <Routes>
             <Route path="/" element={<MovieList />} />
-            <Route path="/movie/:id" element={<MovieDetail />} />
+            <Route path="/movie/:id" element={<MovieDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 

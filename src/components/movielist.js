@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // Add this import at the top
+import React, { useEffect, useState, useCallback } from "react";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { API } from "../api";
 import { Link } from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
+import debounce from 'lodash/debounce';
 
-import { 
+import {
   TextField,
   Button,
   Card,
@@ -17,9 +18,13 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { FaStar } from "react-icons/fa";
 import "../styles/movielist.css";
+
 export default function MovieList() {
   const [movies, setMovies] = useState([]);
   const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const BACKEND_SERVER_URL = "http://localhost:5000";
 
   const [popularMovie, setPopularMovie] = useState([]);
 
@@ -43,20 +48,60 @@ export default function MovieList() {
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
-      const res = await API.get(`/movies/search?q=${query}`);
+      const res = await fetch(`/movies/search?q=${query}`);
       setMovies(res.data);
     } catch (err) {
       console.error(err);
     }
   };
 
+  const debouncedSearch = useCallback(
+    debounce(async (searchQuery) => {
+      if (!searchQuery) {
+        setSuggestions([]);
+        return;
+      }
+      try {
+        console.log('Fetching suggestions for:', searchQuery);
+
+        const response = await fetch(`${BACKEND_SERVER_URL}/movies/autocomplete?q=${searchQuery}`);
+        const data = await response.json();
+        // Update to handle the new response structure
+        if (data.success && data.data.suggestions) {
+          setSuggestions(data.data.suggestions);
+        }
+      } catch (err) {
+        console.error('Error fetching suggestions:', err);
+      }
+    }, 300),
+    []
+  );
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    debouncedSearch(value);
+    setShowSuggestions(true);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setQuery(suggestion.title); // Updated to handle the new suggestion structure
+    setShowSuggestions(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = () => setShowSuggestions(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     fetchMovies();
   }, []);
 
   return (
-    <Box 
-      sx={{ 
+    <Box
+      sx={{
         width: '100vw',
         height: '100vh',
         overflow: 'hidden',
@@ -82,6 +127,7 @@ export default function MovieList() {
           padding: '10px',
           backdropFilter: 'blur(2px)',
           borderRadius: '30px',
+          position: 'relative',
         }}
       >
         <TextField
@@ -89,13 +135,14 @@ export default function MovieList() {
           variant="outlined"
           placeholder="Search movies..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleInputChange}
+          onClick={(e) => e.stopPropagation()}
           InputProps={{
             startAdornment: (
-              <SearchIcon sx={{ 
+              <SearchIcon sx={{
                 color: 'white',
                 opacity: 0.9,
-                mr: 1 
+                mr: 1
               }} />
             ),
           }}
@@ -122,8 +169,48 @@ export default function MovieList() {
             },
           }}
         />
+
+        {/* Updated Suggestions Dropdown */}
+        {showSuggestions && suggestions.length > 0 && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              maxHeight: '300px',
+              overflowY: 'auto',
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+              borderRadius: '10px',
+              mt: 1,
+              zIndex: 1300,
+            }}
+          >
+            {suggestions.map((suggestion, index) => (
+              <Box
+                key={index}
+                onClick={() => handleSuggestionClick(suggestion)}
+                sx={{
+                  padding: '10px 20px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                <Typography sx={{ fontSize: '1rem' }}>
+                  {suggestion.title}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        )}
       </Box>
 
+      {/* Rest of the Carousel component remains unchanged */}
       <Carousel
         className="carousel no-select"
         showThumbs={false}
@@ -146,9 +233,8 @@ export default function MovieList() {
           <div key={user.id} style={{ width: '100vw', height: '100%' }} className="no-select">
             <Box
               style={{ textDecoration: "none", color: "white", height: '100%', display: 'block' }}
-              // to={`/movie/${user.id}`}
             >
-              <div style={{ 
+              <div style={{
                 height: '100vh',
                 position: 'relative',
                 backgroundColor: '#000'
@@ -174,9 +260,6 @@ export default function MovieList() {
                       <FaStar />{" "}
                     </span>
                   </div>
-                  {/* <div className="poster-description">
-                    {user ? user.overview : ""}
-                  </div> */}
                 </div>
               </div>
             </Box>
