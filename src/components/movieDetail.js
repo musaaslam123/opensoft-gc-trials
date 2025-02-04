@@ -140,7 +140,7 @@ export default function MovieDetail() {
                     width: '100%',
                     borderRadius: 2,
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-                    transform: 'translateY(25%)',
+                    transform: 'translateY(20%)',
                   }}
                 />
               </Grid>
